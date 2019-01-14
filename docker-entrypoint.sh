@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Read user names and passwords from the user file and turn them into users
+# Lines should be of the format "username password", with each user on its own line.
+user_file=/config/users
+if [ -e "$user_file" ]; then
+  while read -r line; do
+      read user pass <<<"$line"
+      echo "Adding user #{user} with pass ${pass}"
+      adduser --no-create-home --disabled-password --gecos '' "${user}"
+      echo "${user}:${pass}" | chpasswd
+  done < "$user_file"
+fi
+
 if [ ! -z "${AFP_USER}" ]; then
     if [ ! -z "${AFP_UID}" ]; then
         cmd="$cmd --uid ${AFP_UID}"
